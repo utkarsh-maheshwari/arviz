@@ -5,11 +5,9 @@ import logging
 import re
 
 import numpy as np
-import xarray as xr
 
-from .. import utils
 from .inference_data import InferenceData
-from .base import requires, dict_to_dataset, generate_dims_coords, make_attrs
+from .base import requires, dict_to_dataset
 
 _log = logging.getLogger(__name__)
 
