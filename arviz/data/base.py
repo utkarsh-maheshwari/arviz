@@ -108,7 +108,7 @@ def generate_dims_coords(
                 dims[idx] = dim_name
         dim_name = dims[idx]
         if dim_name not in coords:
-            coords[dim_name] = utils.arange(dim_len) + index_origin
+            coords[dim_name] = utils.arange(index_origin, dim_len+index_origin)
     coords = {key: coord for key, coord in coords.items() if any(key == dim for dim in dims)}
     return dims, coords
 
