@@ -4,6 +4,7 @@ from typing import Dict, List, Any
 import datetime
 import warnings
 import pkg_resources
+import numpy as np
 import xarray as xr
 
 from .. import utils
@@ -108,7 +109,7 @@ def generate_dims_coords(
                 dims[idx] = dim_name
         dim_name = dims[idx]
         if dim_name not in coords:
-            coords[dim_name] = utils.arange(index_origin, dim_len+index_origin)
+            coords[dim_name] = np.arange(index_origin, dim_len + index_origin)
     coords = {key: coord for key, coord in coords.items() if any(key == dim for dim in dims)}
     return dims, coords
 
@@ -182,10 +183,11 @@ def numpy_to_data_array(
     if "chain" not in dims and "chain" in default_dims:
         dims = ["chain"] + dims
 
+    index_origin = rcParams["data.index_origin"]
     if "chain" not in coords and "chain" in default_dims:
-        coords["chain"] = utils.arange(n_chains)
+        coords["chain"] = np.arange(index_origin, n_chains + index_origin)
     if "draw" not in coords and "draw" in default_dims:
-        coords["draw"] = utils.arange(n_samples)
+        coords["draw"] = np.arange(index_origin, n_samples + index_origin)
 
     # filter coords based on the dims
     coords = {key: xr.IndexVariable((key,), data=coords[key]) for key in dims}
