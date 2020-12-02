@@ -68,7 +68,7 @@ jobs:
       fi
 
       grep -Ev '^pystan|^pyro|^emcee|^pymc3' requirements-external.txt | xargs python -m pip install
-
+      
     displayName: 'Install packages'
 
   - script: |
