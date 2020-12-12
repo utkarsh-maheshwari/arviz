@@ -10,17 +10,16 @@ jobs:
   timeoutInMinutes: 360
   strategy:
     matrix:
-      Python_38_Latest:
-        python.version: 3.8
+      Python_39_Latest:
+        python.version: 3.9
         pystan.version: "latest"
         pymc3.version: "latest"
         pyro.version: "latest"
         pytorch.version: "latest"
         emcee.version: "latest"
         name: "External latest"
-
-      Python_38_PyStan_3_PyMC3_gh_Pyro_1_Emcee_2_TF_1:
-        python.version: 3.8
+      Python_39_PyStan_3_PyMC3_gh_Pyro_1_Emcee_2_TF_1:
+        python.version: 3.9
         pystan.version: "preview"
         pymc3.version: "github"
         pyro.version: 1.2
