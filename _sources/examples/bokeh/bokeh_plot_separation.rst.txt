@@ -1,0 +1,18 @@
+
+.. _bokeh_plot_separation:
+
+
+Separation Plot
+===============
+
+
+
+.. bokeh-plot:: /home/vsts/work/1/s/doc/source/examples/bokeh/bokeh_plot_separation.py
+    :source-position: none
+
+**Python source code:** :download:`[download source: bokeh_plot_separation.py]<bokeh_plot_separation.py>`
+
+**API documentation:** :func:`~arviz.plot_separation`
+
+.. literalinclude:: bokeh_plot_separation.py
+    :lines: 7-

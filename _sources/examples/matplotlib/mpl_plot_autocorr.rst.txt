@@ -1,0 +1,17 @@
+
+.. _mpl_plot_autocorr:
+
+
+Autocorrelation Plot
+====================
+
+
+
+.. image:: _images/mpl_plot_autocorr.png
+
+**Python source code:** :download:`[download source: mpl_plot_autocorr.py]<mpl_plot_autocorr.py>`
+
+**API documentation:** :func:`~arviz.plot_autocorr`
+
+.. literalinclude:: mpl_plot_autocorr.py
+    :lines: 8-

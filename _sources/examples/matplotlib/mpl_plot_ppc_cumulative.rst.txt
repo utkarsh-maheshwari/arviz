@@ -1,0 +1,17 @@
+
+.. _mpl_plot_ppc_cumulative:
+
+
+Posterior Predictive Check Cumulative Plot
+==========================================
+
+
+
+.. image:: _images/mpl_plot_ppc_cumulative.png
+
+**Python source code:** :download:`[download source: mpl_plot_ppc_cumulative.py]<mpl_plot_ppc_cumulative.py>`
+
+**API documentation:** :func:`~arviz.plot_ppc`
+
+.. literalinclude:: mpl_plot_ppc_cumulative.py
+    :lines: 8-
