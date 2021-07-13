@@ -26,6 +26,7 @@ from ...plots import (
     plot_joint,
     plot_kde,
     plot_khat,
+    plot_lm,
     plot_loo_pit,
     plot_mcse,
     plot_pair,
@@ -1441,3 +1442,88 @@ def test_plot_bpv_discrete():
     fake_model = from_dict(posterior_predictive=fake_pp, observed_data=fake_obs)
     axes = plot_bpv(fake_model)
     assert not isinstance(axes, np.ndarray)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {},
+        {"y_ppc": "bad_name"},
+        {"x": "x1"},
+        {"x": ("x1", "x2")},
+        {
+            "x": ("x1", "x2"),
+            "y_kwargs": {"color": "blue", "marker": "^"},
+            "y_ppc_plot_kwargs": {"color": "cyan"},
+        },
+        {"x": ("x1", "x2"), "y_model_plot_kwargs": {"color": "red"}},
+        {
+            "x": ("x1", "x2"),
+            "kind_pp": "hdi",
+            "kind_model": "hdi",
+            "y_model_fill_kwargs": {"color": "red"},
+            "y_ppc_fill_kwargs": {"color": "cyan"},
+        },
+    ],
+)
+def test_plot_lm(models, kwargs):
+    idata = models.model_1
+    if "constant_data" not in idata.groups():
+        y = idata.observed_data["y"]
+        x1data = y.coords[y.dims[0]]
+        idata.add_groups({"constant_data": {"_": x1data}})
+        idata.constant_data["x1"] = x1data
+        idata.constant_data["x2"] = x1data
+
+    axes = plot_lm(idata=idata, y="y", y_model="eta", xjitter=True, show=True, **kwargs)
+    assert np.all(axes)
+
+
+def test_plot_lm_multidim(multidim_models):
+    idata = multidim_models.model_1
+    axes = plot_lm(
+        idata=idata,
+        x=idata.observed_data["y"].coords["dim1"].values,
+        y="y",
+        plot_dim="dim1",
+        show=True,
+        figsize=(4, 16),
+    )
+    assert np.all(axes)
+
+
+def test_plot_lm_bad_kind(models, multidim_models):
+    idata1 = models.model_1
+    idata2 = multidim_models.model_1
+    with pytest.raises(TypeError):
+        plot_lm(idata=idata1, y="y", kind_pp="bad_kind")
+    with pytest.raises(TypeError):
+        plot_lm(idata=idata2, y="y", kind_model="bad_kind")
+    with pytest.raises(TypeError):
+        plot_lm(idata=idata1, y="y", num_pp_samples=-1)
+
+    with pytest.raises(ValueError):
+        plot_lm(idata=idata2, y="y")
+
+    with pytest.warns(UserWarning):
+        plot_lm(
+            idata=from_dict(observed_data={"y": idata1.observed_data["y"].values}),
+            y="y",
+            y_ppc="bad_name",
+            y_model="bad_name",
+        )
+    with pytest.warns(UserWarning):
+        plot_lm(
+            idata=from_dict(observed_data={"y": idata1.observed_data["y"].values}),
+            y="y",
+            y_ppc="bad_name",
+        )
+    with pytest.warns(UserWarning):
+        plot_lm(idata=idata1, y="y", y_model="none")
+    with pytest.warns(UserWarning):
+        plot_lm(idata=idata1, y="y", y_ppc="none")
+
+
+def test_plot_lm_list():
+    y = [1, 2, 3, 4, 5]
+    assert plot_lm(y=y, x=np.arange(len(y)), show=True)
