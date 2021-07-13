@@ -1495,9 +1495,9 @@ def test_plot_lm_multidim(multidim_models):
 def test_plot_lm_bad_kind(models, multidim_models):
     idata1 = models.model_1
     idata2 = multidim_models.model_1
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         plot_lm(idata=idata1, y="y", kind_pp="bad_kind")
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         plot_lm(idata=idata2, y="y", kind_model="bad_kind")
     with pytest.raises(TypeError):
         plot_lm(idata=idata1, y="y", num_pp_samples=-1)

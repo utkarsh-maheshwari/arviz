@@ -1158,7 +1158,7 @@ def test_plot_lm_list():
 def test_plot_lm_bad_kind(models, multidim_models):
     idata1 = models.model_1
     idata2 = multidim_models.model_1
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         plot_lm(
             idata=idata1,
             y="y",
@@ -1166,7 +1166,7 @@ def test_plot_lm_bad_kind(models, multidim_models):
             show=False,
             backend="bokeh",
         )
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         plot_lm(
             idata=idata2,
             y="y",
