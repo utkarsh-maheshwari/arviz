@@ -91,6 +91,21 @@ def plot_lm(
     Returns
     -------
     axes
+
+    Examples
+    --------
+    Plot regression default plot
+
+    .. plot::
+        :context: close-figs
+
+        >>> import arviz as az
+        >>> idata = az.load_arviz_data('regrssion1d')
+        >>> data.add_groups({"constant_data": {"x":x}})
+        >>> data.posterior["y_model"] = (
+        ... data.posterior["intercept"] + data.posterior["slope"]*data.constant_data["x"]
+        ... )
+        >>> az.plot_lm(idata=data, y="y", x="x", y_model="y_model")
     """
     if kind_pp not in ("samples", "hdi"):
         raise ValueError("kind_ppc should be either samples or hdi")
@@ -142,7 +157,7 @@ def plot_lm(
     if isinstance(y_ppc, str):
         if "posterior_predictive" not in idata.groups():
             warnings.warn("posterior_predictive not found in idata", UserWarning)
-            y_ppc=None
+            y_ppc = None
         elif hasattr(idata.posterior_predictive, y_ppc):
             y_ppc = idata.posterior_predictive[y_ppc]
         else:
@@ -200,7 +215,7 @@ def plot_lm(
         "plot_lm",
     )
 
-    # If there is multiple x and multidimensional y, we need total of len(x)*len(y) graphs
+    # If there are multiple x and multidimensional y, we need total of len(x)*len(y) graphs
     len_y = len(y)
     len_x = len(x)
     length_plotters = len_x * len_y
@@ -244,7 +259,7 @@ def plot_lm(
         y_model = np.tile(y_model, (len_x, 1))
 
     length_plotters = len_x * len_y
-    rows, cols = default_grid(length_plotters, grid=None)
+    rows, cols = default_grid(length_plotters)
 
     lmplot_kwargs = dict(
         x=x,
