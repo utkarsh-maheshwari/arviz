@@ -1448,13 +1448,13 @@ def test_plot_bpv_discrete():
     "kwargs",
     [
         {},
-        {"y_ppc": "bad_name"},
+        {"y_hat": "bad_name"},
         {"x": "x1"},
         {"x": ("x1", "x2")},
         {
             "x": ("x1", "x2"),
             "y_kwargs": {"color": "blue", "marker": "^"},
-            "y_ppc_plot_kwargs": {"color": "cyan"},
+            "y_hat_plot_kwargs": {"color": "cyan"},
         },
         {"x": ("x1", "x2"), "y_model_plot_kwargs": {"color": "red"}},
         {
@@ -1462,7 +1462,7 @@ def test_plot_bpv_discrete():
             "kind_pp": "hdi",
             "kind_model": "hdi",
             "y_model_fill_kwargs": {"color": "red"},
-            "y_ppc_fill_kwargs": {"color": "cyan"},
+            "y_hat_fill_kwargs": {"color": "cyan"},
         },
     ],
 )
@@ -1475,7 +1475,7 @@ def test_plot_lm(models, kwargs):
         idata.constant_data["x1"] = x1data
         idata.constant_data["x2"] = x1data
 
-    axes = plot_lm(idata=idata, y="y", y_model="eta", xjitter=True, show=True, **kwargs)
+    axes = plot_lm(idata=idata, y="y", y_model="eta", xjitter=True, **kwargs)
     assert np.all(axes)
 
 
@@ -1509,19 +1509,19 @@ def test_plot_lm_bad_kind(models, multidim_models):
         plot_lm(
             idata=from_dict(observed_data={"y": idata1.observed_data["y"].values}),
             y="y",
-            y_ppc="bad_name",
+            y_hat="bad_name",
             y_model="bad_name",
         )
     with pytest.warns(UserWarning):
         plot_lm(
             idata=from_dict(observed_data={"y": idata1.observed_data["y"].values}),
             y="y",
-            y_ppc="bad_name",
+            y_hat="bad_name",
         )
     with pytest.warns(UserWarning):
         plot_lm(idata=idata1, y="y", y_model="none")
     with pytest.warns(UserWarning):
-        plot_lm(idata=idata1, y="y", y_ppc="none")
+        plot_lm(idata=idata1, y="y", y_hat="none")
 
 
 def test_plot_lm_list():

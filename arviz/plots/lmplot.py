@@ -16,7 +16,7 @@ def plot_lm(
     idata=None,
     x=None,
     y_model=None,
-    y_ppc=None,
+    y_hat=None,
     num_pp_samples=50,
     kind_pp="samples",
     kind_model="lines",
@@ -24,8 +24,8 @@ def plot_lm(
     plot_dim=None,
     backend=None,
     y_kwargs=None,
-    y_ppc_plot_kwargs=None,
-    y_ppc_fill_kwargs=None,
+    y_hat_plot_kwargs=None,
+    y_hat_fill_kwargs=None,
     y_model_plot_kwargs=None,
     y_model_fill_kwargs=None,
     backend_kwargs=None,
@@ -51,7 +51,7 @@ def plot_lm(
     y_model : str or Sequence, Optional
         If str, varibale name from posterior.
         Its dimensions should be same as y plus added chains and draws.
-    y_ppc : str, Optional
+    y_hat : str, Optional
         If str, variable name from posterior_predictive.
         Its dimensions should be same as y plus added chains and draws.
     num_pp_samples : int, Optional, Default 50
@@ -63,9 +63,9 @@ def plot_lm(
         Select plotting backend {"matplotlib","bokeh"}. Default "matplotlib".
     y_kwargs : dict, optional
         Passed to plot() in matplotlib and circle() in bokeh
-    y_ppc_plot_kwargs : dict, optional
+    y_hat_plot_kwargs : dict, optional
         Passed to plot() in matplotlib and circle() in bokeh
-    y_ppc_fill_kwargs : dict, optional
+    y_hat_fill_kwargs : dict, optional
         Passed to az.plot_hdi()
     y_model_plot_kwargs : dict, optional
         Passed to plot() in matplotlib and line() in bokeh
@@ -90,7 +90,7 @@ def plot_lm(
 
     Returns
     -------
-    axes
+    axes: matplotlib axes or bokeh figures
 
     Examples
     --------
@@ -101,11 +101,38 @@ def plot_lm(
 
         >>> import arviz as az
         >>> idata = az.load_arviz_data('regrssion1d')
-        >>> data.add_groups({"constant_data": {"x":x}})
-        >>> data.posterior["y_model"] = (
-        ... data.posterior["intercept"] + data.posterior["slope"]*data.constant_data["x"]
-        ... )
+        >>> x = xr.DataArray(np.linspace(0, 1, 100))
+        >>> data.posterior["y_model"] = data.posterior["intercept"] + data.posterior["slope"]*x
+        >>> az.plot_lm(idata=data, y="y", x="x")
+
+    Plot regression data and uncertanity in mean
+
+    .. plot:
+        :context: close-figs
+
         >>> az.plot_lm(idata=data, y="y", x="x", y_model="y_model")
+
+    Plot regression data and uncertanity in hdi form
+
+    .. plot:
+        :context: close-figs
+
+        >>> az.plot_lm(
+        ...     idata=data, y="y", x="x", y_model="y_model", kind_pp="hdi", kind_model="hdi"
+        ... )
+
+    Plot regression data for multi-dimentional y using plot_dim
+
+    .. plot:
+        :context: close-figs
+
+        >>> data = az.from_dict(
+        ...     observed_data = { "y": np.random.normal(size=(5, 7)) },
+        ...     posterior_predictive = {"y": np.random.randn(4, 1000, 5, 7) / 2}
+        ...     dims={"y": ["dim1", "dim2"]},
+        ...     coords={"dim1": range(5), "dim2": range(7)}
+        ... )
+        >>> az.plot_lm(idata=data, y="y", plot_dim="dim1")
     """
     if kind_pp not in ("samples", "hdi"):
         raise ValueError("kind_ppc should be either samples or hdi")
@@ -113,8 +140,8 @@ def plot_lm(
     if kind_model not in ("lines", "hdi"):
         raise ValueError("kind_model should be either lines or hdi")
 
-    if y_ppc is None and isinstance(y, str):
-        y_ppc = y
+    if y_hat is None and isinstance(y, str):
+        y_hat = y
 
     if isinstance(y, str):
         y = idata.observed_data[y]
@@ -154,22 +181,22 @@ def plot_lm(
             warnings.warn("y_model not found in posterior", UserWarning)
             y_model = None
 
-    if isinstance(y_ppc, str):
+    if isinstance(y_hat, str):
         if "posterior_predictive" not in idata.groups():
             warnings.warn("posterior_predictive not found in idata", UserWarning)
-            y_ppc = None
-        elif hasattr(idata.posterior_predictive, y_ppc):
-            y_ppc = idata.posterior_predictive[y_ppc]
+            y_hat = None
+        elif hasattr(idata.posterior_predictive, y_hat):
+            y_hat = idata.posterior_predictive[y_hat]
         else:
-            warnings.warn("y_ppc not found in posterior_predictive", UserWarning)
-            y_ppc = None
+            warnings.warn("y_hat not found in posterior_predictive", UserWarning)
+            y_hat = None
 
     pp_sample_ix = None
-    if (y_ppc is not None and kind_pp == "samples") or (
+    if (y_hat is not None and kind_pp == "samples") or (
         y_model is not None and kind_model == "lines"
     ):
-        if y_ppc is not None:
-            total_pp_samples = y_ppc.sizes["chain"] * y_ppc.sizes["draw"]
+        if y_hat is not None:
+            total_pp_samples = y_hat.sizes["chain"] * y_hat.sizes["draw"]
         else:
             total_pp_samples = y_model.sizes["chain"] * y_model.sizes["draw"]
 
@@ -222,24 +249,24 @@ def plot_lm(
     y = np.tile(y, (len_x, 1))
     x = np.tile(x, (len_y, 1))
 
-    if y_ppc is not None:
+    if y_hat is not None:
         if kind_pp == "samples":
-            y_ppc = y_ppc.stack(sample=("chain", "draw"))[..., pp_sample_ix]
+            y_hat = y_hat.stack(sample=("chain", "draw"))[..., pp_sample_ix]
             skip_dims += ["sample"]
 
-        y_ppc = [
+        y_hat = [
             tup
             for _, tup in zip(
                 range(len_y),
                 xarray_var_iter(
-                    y_ppc,
+                    y_hat,
                     skip_dims=set(skip_dims),
                     combined=True,
                 ),
             )
         ]
 
-        y_ppc = np.tile(y_ppc, (len_x, 1))
+        y_hat = np.tile(y_hat, (len_x, 1))
 
     if y_model is not None:
         if kind_model == "lines":
@@ -265,7 +292,7 @@ def plot_lm(
         x=x,
         y=y,
         y_model=y_model,
-        y_ppc=y_ppc,
+        y_hat=y_hat,
         num_pp_samples=num_pp_samples,
         kind_pp=kind_pp,
         kind_model=kind_model,
@@ -274,8 +301,8 @@ def plot_lm(
         rows=rows,
         cols=cols,
         y_kwargs=y_kwargs,
-        y_ppc_plot_kwargs=y_ppc_plot_kwargs,
-        y_ppc_fill_kwargs=y_ppc_fill_kwargs,
+        y_hat_plot_kwargs=y_hat_plot_kwargs,
+        y_hat_fill_kwargs=y_hat_fill_kwargs,
         y_model_plot_kwargs=y_model_plot_kwargs,
         y_model_fill_kwargs=y_model_fill_kwargs,
         backend_kwargs=backend_kwargs,

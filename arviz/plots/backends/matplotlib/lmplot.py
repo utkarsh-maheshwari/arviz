@@ -11,7 +11,7 @@ def plot_lm(
     x,
     y,
     y_model,
-    y_ppc,
+    y_hat,
     num_pp_samples,
     kind_pp,
     kind_model,
@@ -20,8 +20,8 @@ def plot_lm(
     rows,
     cols,
     y_kwargs,
-    y_ppc_plot_kwargs,
-    y_ppc_fill_kwargs,
+    y_hat_plot_kwargs,
+    y_hat_fill_kwargs,
     y_model_plot_kwargs,
     y_model_fill_kwargs,
     backend_kwargs,
@@ -59,15 +59,15 @@ def plot_lm(
         y_kwargs.setdefault("zorder", 10)
         y_kwargs.setdefault("label", "observed_data")
 
-        y_ppc_plot_kwargs = matplotlib_kwarg_dealiaser(y_ppc_plot_kwargs, "plot")
-        y_ppc_plot_kwargs.setdefault("color", "C1")
-        y_ppc_plot_kwargs.setdefault("alpha", 0.3)
-        y_ppc_plot_kwargs.setdefault("markersize", 10)
-        y_ppc_plot_kwargs.setdefault("marker", ".")
-        y_ppc_plot_kwargs.setdefault("linewidth", 0)
+        y_hat_plot_kwargs = matplotlib_kwarg_dealiaser(y_hat_plot_kwargs, "plot")
+        y_hat_plot_kwargs.setdefault("color", "C1")
+        y_hat_plot_kwargs.setdefault("alpha", 0.3)
+        y_hat_plot_kwargs.setdefault("markersize", 10)
+        y_hat_plot_kwargs.setdefault("marker", ".")
+        y_hat_plot_kwargs.setdefault("linewidth", 0)
 
-        y_ppc_fill_kwargs = matplotlib_kwarg_dealiaser(y_ppc_fill_kwargs, "fill_between")
-        y_ppc_fill_kwargs.setdefault("color", "C1")
+        y_hat_fill_kwargs = matplotlib_kwarg_dealiaser(y_hat_fill_kwargs, "fill_between")
+        y_hat_fill_kwargs.setdefault("color", "C1")
 
         y_model_plot_kwargs = matplotlib_kwarg_dealiaser(y_model_plot_kwargs, "plot")
         y_model_plot_kwargs.setdefault("color", "k")
@@ -87,8 +87,8 @@ def plot_lm(
         ax_i.set_xlabel(x_var_name)
         ax_i.set_ylabel(y_var_name)
 
-        if y_ppc is not None:
-            _, _, _, y_ppc_plotters = y_ppc[i]
+        if y_hat is not None:
+            _, _, _, y_hat_plotters = y_hat[i]
             if kind_pp == "samples":
                 for j in range(num_pp_samples):
                     if xjitter is True:
@@ -97,14 +97,14 @@ def plot_lm(
                         x_plotters_jitter = x_plotters + np.random.uniform(
                             low=-scale_high, high=scale_high, size=len(x_plotters)
                         )
-                        ax_i.plot(x_plotters_jitter, y_ppc_plotters[..., j], **y_ppc_plot_kwargs)
+                        ax_i.plot(x_plotters_jitter, y_hat_plotters[..., j], **y_hat_plot_kwargs)
                     else:
-                        ax_i.plot(x_plotters, y_ppc_plotters[..., j], **y_ppc_plot_kwargs)
-                ax_i.plot([], **y_ppc_plot_kwargs, label="Posterior predictive samples")
+                        ax_i.plot(x_plotters, y_hat_plotters[..., j], **y_hat_plot_kwargs)
+                ax_i.plot([], **y_hat_plot_kwargs, label="Posterior predictive samples")
             else:
-                plot_hdi(x_plotters, y_ppc_plotters, ax=ax_i, **y_ppc_fill_kwargs)
+                plot_hdi(x_plotters, y_hat_plotters, ax=ax_i, **y_hat_fill_kwargs)
                 ax_i.plot(
-                    [], color=y_ppc_fill_kwargs["color"], label="Posterior predictive samples"
+                    [], color=y_hat_fill_kwargs["color"], label="Posterior predictive samples"
                 )
 
         if y_model is not None:

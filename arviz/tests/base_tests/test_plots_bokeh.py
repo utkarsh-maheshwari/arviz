@@ -1116,7 +1116,7 @@ def test_plot_bpv_discrete():
         {
             "x": ("x1", "x2"),
             "y_kwargs": {"fill_color": "blue"},
-            "y_ppc_plot_kwargs": {"fill_color": "orange"},
+            "y_hat_plot_kwargs": {"fill_color": "orange"},
             "legend": True,
         },
         {"x": ("x1", "x2"), "y_model_plot_kwargs": {"line_color": "red"}},
@@ -1125,7 +1125,7 @@ def test_plot_bpv_discrete():
             "kind_pp": "hdi",
             "kind_model": "hdi",
             "y_model_fill_kwargs": {"color": "red"},
-            "y_ppc_fill_kwargs": {"color": "cyan"},
+            "y_hat_fill_kwargs": {"color": "cyan"},
         },
     ],
 )
@@ -1195,7 +1195,7 @@ def test_plot_lm_bad_kind(models, multidim_models):
         plot_lm(
             idata=from_dict(observed_data={"y": idata1.observed_data["y"].values}),
             y="y",
-            y_ppc="bad_name",
+            y_hat="bad_name",
             y_model="bad_name",
             show=False,
             backend="bokeh",
@@ -1204,11 +1204,11 @@ def test_plot_lm_bad_kind(models, multidim_models):
         plot_lm(
             idata=from_dict(observed_data={"y": idata1.observed_data["y"].values}),
             y="y",
-            y_ppc="bad_name",
+            y_hat="bad_name",
             show=False,
             backend="bokeh",
         )
     with pytest.warns(UserWarning):
         plot_lm(idata=idata1, y="y", y_model="none", show=False, backend="bokeh")
     with pytest.warns(UserWarning):
-        plot_lm(idata=idata1, y="y", y_ppc="none", show=False, backend="bokeh")
+        plot_lm(idata=idata1, y="y", y_hat="none", show=False, backend="bokeh")

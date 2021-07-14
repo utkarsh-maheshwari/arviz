@@ -13,7 +13,7 @@ def plot_lm(
     x,
     y,
     y_model,
-    y_ppc,
+    y_hat,
     num_pp_samples,
     kind_pp,
     kind_model,
@@ -22,8 +22,8 @@ def plot_lm(
     rows,
     cols,
     y_kwargs,
-    y_ppc_plot_kwargs,
-    y_ppc_fill_kwargs,
+    y_hat_plot_kwargs,
+    y_hat_fill_kwargs,
     y_model_plot_kwargs,
     y_model_fill_kwargs,
     backend_kwargs,
@@ -53,14 +53,14 @@ def plot_lm(
     y_kwargs.setdefault("line_width", 0)
     y_kwargs.setdefault("size", 3)
 
-    if y_ppc_plot_kwargs is None:
-        y_ppc_plot_kwargs = {}
-    y_ppc_plot_kwargs.setdefault("fill_color", "orange")
-    y_ppc_plot_kwargs.setdefault("line_width", 0)
+    if y_hat_plot_kwargs is None:
+        y_hat_plot_kwargs = {}
+    y_hat_plot_kwargs.setdefault("fill_color", "orange")
+    y_hat_plot_kwargs.setdefault("line_width", 0)
 
-    if y_ppc_fill_kwargs is None:
-        y_ppc_fill_kwargs = {}
-    y_ppc_fill_kwargs.setdefault("color", "orange")
+    if y_hat_fill_kwargs is None:
+        y_hat_fill_kwargs = {}
+    y_hat_fill_kwargs.setdefault("color", "orange")
 
     if y_model_plot_kwargs is None:
         y_model_plot_kwargs = {}
@@ -81,8 +81,8 @@ def plot_lm(
         observed_legend = ax_i.circle(x_plotters, y_plotters, **y_kwargs)
         legend_it.append(("Observed", [observed_legend]))
 
-        if y_ppc is not None:
-            _, _, _, y_ppc_plotters = y_ppc[i]
+        if y_hat is not None:
+            _, _, _, y_hat_plotters = y_hat[i]
             if kind_pp == "samples":
                 posterior_legend = []
                 for j in range(num_pp_samples):
@@ -94,13 +94,13 @@ def plot_lm(
                         )
                         posterior_circle = ax_i.circle(
                             x_plotters_jitter,
-                            y_ppc_plotters[..., j],
+                            y_hat_plotters[..., j],
                             alpha=0.2,
-                            **y_ppc_plot_kwargs,
+                            **y_hat_plot_kwargs,
                         )
                     else:
                         posterior_circle = ax_i.circle(
-                            x_plotters, y_ppc_plotters[..., j], alpha=0.2, **y_ppc_plot_kwargs
+                            x_plotters, y_hat_plotters[..., j], alpha=0.2, **y_hat_plot_kwargs
                         )
                     posterior_legend.append(posterior_circle)
                 legend_it.append(("Posterior predictive samples", posterior_legend))
@@ -108,10 +108,10 @@ def plot_lm(
             else:
                 plot_hdi(
                     x_plotters,
-                    y_ppc_plotters,
+                    y_hat_plotters,
                     ax=ax_i,
                     backend="bokeh",
-                    fill_kwargs=y_ppc_fill_kwargs,
+                    fill_kwargs=y_hat_fill_kwargs,
                     show=False,
                 )
 
