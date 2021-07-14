@@ -7,7 +7,6 @@ from ...hdiplot import plot_hdi
 from . import create_axes_grid, matplotlib_kwarg_dealiaser, backend_show, backend_kwarg_defaults
 
 
-
 def plot_lm(
     x,
     y,
@@ -44,6 +43,7 @@ def plot_lm(
 
     figsize, _, _, xt_labelsize, _, _ = _scale_fig_size(figsize, textsize, rows, cols)
     backend_kwargs.setdefault("figsize", figsize)
+    backend_kwargs.setdefault("squeeze", False)
 
     if axes is None:
         _, axes = create_axes_grid(length_plotters, rows, cols, backend_kwargs=backend_kwargs)
